@@ -6,88 +6,56 @@ let prompt = require('prompt-sync')({
 });
 
 const LIVES = 9;
-const SECRETWORD = "GUTSY";
 
 const guesses = [];
 
-const painSounds = [
-  "owowow",
-  "yeoouch",
-  "i can't feel my leg",
-  "that's smarts",
-  "pull it together!",
-  "nonononono",
-  "i need my momma",
-  "augghhh",
-  "aw jeez, this is it",
-  "tell me ma i love her",
-];
+console.log("you have started a game of hangman");
 
-const HANGPERSON = "HANGPERSON says: ";
-const SCOUNDREL = "SCOUNDREL says: ";
+const SECRETWORD = "onomonapoea".toUpperCase();
+console.log("i have secretly picked a word for you to guess");
 
-console.log(HANGPERSON + "WELCOME to HANGPERSON");
-console.log(HANGPERSON + "GUESS the WORD or the SCOUNDREL DIES");
+console.log("status:", "_ ".repeat(SECRETWORD.length));
 
+let correctGuesses = [];
+let secretReveal;
 do {
-  console.log(`
-  HANGPERSON STATUS:
-  ${LIVES - guesses.length}/${LIVES} guesses left
-  `);
+  let guess = "";
+  do {
+    guess = prompt("guess a letter: ").toUpperCase().trim().substring(0, 1);
+  } while( guess.length == 0 )
 
-  let correctGuesses = [];
+  guesses.push(guess);
+
+  secretReveal = SECRETWORD;
+  correctGuesses = []
+
   for (let h = 0; h < guesses.length; h++) {
-    console.log(`DEBUG: looking at you, kid`);
     let charChecked = guesses[h].toUpperCase();
-    console.log(`DEBUG: looking at ${charChecked}`);
     if (SECRETWORD.toUpperCase().includes(charChecked)) {
       correctGuesses.push(charChecked);
-      console.log(`DEBUG: correctGuesses updated, now ${correctGuesses}`)
     }
   }
-
-  let secretReveal = SECRETWORD;
 
   for (let i = 0; i < secretReveal.length; i++) {
     let char = secretReveal.charAt(i).toUpperCase();
-    console.log(`DEBUG: checking ${i}th character of ${secretReveal}`);
-    if (correctGuesses.includes(char)) {
-      console.log(`DEBUG: guesses includes ${char}`);
-      correctGuesses[correctGuesses.lastIndexOf(char)] = '?'
-      console.log(`DEBUG: correctGuesses updated, now ${correctGuesses}`)
-    } else {
-      console.log(`DEBUG: guesses doesnt include ${char}`);
+    if (!correctGuesses.includes(char)) {
       secretReveal = secretReveal.replace(char, '_');
-      console.log(`DEBUG: secretReveal updated, now ${secretReveal}`)
     }
   }
-
-  console.log(HANGPERSON + `HERE's what you've GUESSED so FAR:
-  ${secretReveal.split(''). join(' ')}
-  `);
-
-  let guess = prompt(HANGPERSON + 'any LAST words?').toUpperCase();
-
-  if (guess.length != 1) {
-    console.log(HANGPERSON+"ONE CHARACTER at a TIME, ya RASCAL");
-    continue;
-  } else {
-    guesses.push(guess);
-  }
-
-  console.log(`DEBUG: guesses includes ${guesses.toString}`);
+  console.log("status:", secretReveal.split(''). join(' '));
 
   if (SECRETWORD.includes(guess)) {
-    console.log(HANGPERSON + "That's ONE of 'EM!");
+    console.log("you correctly guessed a letter in the secret word");
   } else {
-    console.log(SCOUNDREL + painSounds[Math.floor(Math.random()*painSounds.length)]);
+    console.log("that letter is not in the secret word so you lose a life");
   }
 
-} while (guesses.length < LIVES); // could represent whether the letters all exist in the guesses or guesses > LIVES
-//!SECRETWORD.includes(guesses.toString) &&
+  console.log(`you have ${LIVES - (guesses.length - correctGuesses.length)} lives left\n`);
+} while ((LIVES - guesses.length + correctGuesses.length) > 0 && secretReveal.includes('_'));
 
-console.log('hello world');
-
-function debug(msg) {
-  return "DEBUG MSG: " + msg;
+if (secretReveal.includes('_')) {
+  console.log("you lost all your lives and so you lose the game");
+  console.log("i will reveal the word to you, it was", SECRETWORD);
+} else {
+  console.log("you guessed all the letters and so you won");
 }
