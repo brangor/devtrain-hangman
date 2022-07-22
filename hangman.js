@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// @ts-check
 
 let prompt = require('prompt-sync')({
   sigint: true // lets you ctrl-c escape the program within the prompt
