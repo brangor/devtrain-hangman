@@ -10,7 +10,7 @@ const guesses = [];
 
 console.log("you have started a game of hangman");
 
-const SECRETWORD = "onomonapoea".toUpperCase();
+const SECRETWORD = "onomatopoeia".toUpperCase();
 console.log("i have secretly picked a word for you to guess");
 
 console.log("status:", "_ ".repeat(SECRETWORD.length));
@@ -26,21 +26,22 @@ do {
   guesses.push(guess);
 
   secretReveal = SECRETWORD;
-  correctGuesses = []
+  correctGuesses = [];
 
   for (let h = 0; h < guesses.length; h++) {
-    let charChecked = guesses[h].toUpperCase();
+    let charChecked = guesses[h];
     if (SECRETWORD.toUpperCase().includes(charChecked)) {
       correctGuesses.push(charChecked);
     }
   }
 
   for (let i = 0; i < secretReveal.length; i++) {
-    let char = secretReveal.charAt(i).toUpperCase();
+    let char = secretReveal.charAt(i);
     if (!correctGuesses.includes(char)) {
       secretReveal = secretReveal.replace(char, '_');
     }
   }
+
   console.log("status:", secretReveal.split(''). join(' '));
 
   if (SECRETWORD.includes(guess)) {
@@ -50,6 +51,7 @@ do {
   }
 
   console.log(`you have ${LIVES - (guesses.length - correctGuesses.length)} lives left\n`);
+
 } while ((LIVES - guesses.length + correctGuesses.length) > 0 && secretReveal.includes('_'));
 
 if (secretReveal.includes('_')) {
