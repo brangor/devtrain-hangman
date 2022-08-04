@@ -5,7 +5,10 @@ const dictionaryFile = './lib/dictionary.json';
 import { readFile } from 'fs/promises';
 import promptSync from 'prompt-sync';
 
-const prompt = promptSync();
+const CONFIG = {
+  instream: promptSync(),
+  outstream: process.stdout
+}
 
 async function main() {
   const dictionary =
@@ -13,9 +16,9 @@ async function main() {
       await readFile(dictionaryFile, import.meta.file)
     );
 
-  // console.log(selectRandomWord(dictionary)["word"]);
   const secretWord = selectRandomWord(dictionary);
-  game(secretWord);
+
+  game(secretWord, CONFIG.outstream, CONFIG.instream);
 }
 
 main();
@@ -27,49 +30,59 @@ function selectRandomWord( wordList ) {
   return randomWord;
 }
 
-function game( secret ) {
+function game( secret, outstream, instream ) {
 
   const LIVES = 9;
   const guesses = [];
 
-  console.log("you have started a game of hangman");
+  output("welcome to hangman", outstream);
 
   const SECRETWORD = secret["word"].toUpperCase();
 
-  console.log("status:", hideLetters(SECRETWORD, correctGuesses(SECRETWORD, guesses)));
+  output("status: " + hideLetters(SECRETWORD, correctGuesses(SECRETWORD, guesses)), outstream);
 
   let secretReveal;
   do {
-    console.log("definition:",hint(secret["definition"], guesses));
-
     let guess = "";
     do {
-      guess = prompt("guess a letter: ").toUpperCase().trim().substring(0, 1);
+      guess = input("guess a letter: ", instream).toUpperCase().trim().substring(0, 1);
     } while( guess.length == 0 )
+
+    clearConsole( outstream );
 
     guesses.push(guess);
 
     secretReveal = hideLetters(SECRETWORD, correctGuesses(SECRETWORD, guesses));
 
-    console.log("\nstatus:", secretReveal);
-
-    if (SECRETWORD.includes(guess)) {
-      console.log("\nCORRECT!");
-    } else {
-      console.log("\nWRONG!");
-    }
-
-    console.log("\nguesses:", showGuesses(guesses));
-    console.log("lives left:", LIVES - (guesses.length - correctGuesses(SECRETWORD, guesses).length));
+    output("status: " + secretReveal, outstream);
+    output("guesses: " + showGuesses(guesses), outstream, false);
+    output("lives: " + (LIVES - (guesses.length - correctGuesses(SECRETWORD, guesses).length)), outstream, false);
 
   } while ((LIVES - guesses.length + correctGuesses(SECRETWORD, guesses).length) > 0 && secretReveal.includes('_'));
 
+  clearConsole( outstream );
+
   if (secretReveal.includes('_')) {
-    console.log("you lost all your lives and so you lose the game");
-    console.log("i will reveal the word to you, it was", SECRETWORD);
+    output("you lost all your lives and so you lose the game", outstream);
+    output("you were trying to guess " + SECRETWORD, outstream);
   } else {
-    console.log("you guessed all the letters and so you won");
+    output("you won", outstream);
+    output("you guessed " + SECRETWORD, outstream);
   }
+
+  output("that means:\n\t" + secret["definition"], outstream);
+}
+
+function output( text, outstream, newline = true ) {
+  outstream.write(String(text) + (newline ? "\n\n" : "\n"));
+}
+
+function input( text, instream ) {
+  return instream(text);
+}
+
+function clearConsole( outstream ) {
+  outstream.write("\x1B[2J");
 }
 
 function correctGuesses( secretWord, guesses ) {
@@ -97,10 +110,6 @@ function hideLetters( word, correctGuesses ) {
   return array.join(" ");
 }
 
-function hint( text, permittedLetters ) {
-  const format = "/"+permittedLetters.join("")+"/i";
-  return text.replace(format, "?");
-}
 
 function showGuesses( guesses ) {
   return (guesses.length > 0) ? guesses.join(", ") : "";
