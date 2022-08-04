@@ -18,7 +18,7 @@ async function main() {
 
   const secretWord = selectRandomWord(dictionary);
 
-  game(secretWord, CONFIG.outstream, CONFIG.instream);
+  game(secretWord);
 }
 
 main();
@@ -30,59 +30,61 @@ function selectRandomWord( wordList ) {
   return randomWord;
 }
 
-function game( secret, outstream, instream ) {
+function game( secret ) {
+  clearConsole();
 
   const LIVES = 9;
   const guesses = [];
 
-  output("welcome to hangman", outstream);
+  output("welcome to hangman");
 
   const SECRETWORD = secret["word"].toUpperCase();
 
-  output("status: " + hideLetters(SECRETWORD, correctGuesses(SECRETWORD, guesses)), outstream);
+  output("status: " + hideLetters(SECRETWORD, correctGuesses(SECRETWORD, guesses)));
 
   let secretReveal;
+
   do {
     let guess = "";
     do {
-      guess = input("guess a letter: ", instream).toUpperCase().trim().substring(0, 1);
+      guess = input("guess a letter: ").toUpperCase().trim().substring(0, 1);
     } while( guess.length == 0 )
 
-    clearConsole( outstream );
+    clearConsole();
 
     guesses.push(guess);
 
     secretReveal = hideLetters(SECRETWORD, correctGuesses(SECRETWORD, guesses));
 
-    output("status: " + secretReveal, outstream);
-    output("guesses: " + showGuesses(guesses), outstream, false);
-    output("lives: " + (LIVES - (guesses.length - correctGuesses(SECRETWORD, guesses).length)), outstream, false);
+    output("status: " + secretReveal);
+    output("guesses: " + showGuesses(guesses), false);
+    output("lives: " + (LIVES - (guesses.length - correctGuesses(SECRETWORD, guesses).length)), false);
 
   } while ((LIVES - guesses.length + correctGuesses(SECRETWORD, guesses).length) > 0 && secretReveal.includes('_'));
 
-  clearConsole( outstream );
+  clearConsole();
 
   if (secretReveal.includes('_')) {
-    output("you lost all your lives and so you lose the game", outstream);
-    output("you were trying to guess " + SECRETWORD, outstream);
+    output("you lost the game");
+    output("you were trying to guess " + SECRETWORD);
   } else {
-    output("you won", outstream);
-    output("you guessed " + SECRETWORD, outstream);
+    output("you won");
+    output("you guessed " + SECRETWORD);
   }
 
-  output("that means:\n\t" + secret["definition"], outstream);
+  output("that means:\n\t" + secret["definition"], false);
 }
 
-function output( text, outstream, newline = true ) {
-  outstream.write(String(text) + (newline ? "\n\n" : "\n"));
+function output( text, newline = true ) {
+  CONFIG.outstream.write(text + (newline ? "\n\n" : "\n"));
 }
 
-function input( text, instream ) {
-  return instream(text);
+function input( text ) {
+  return CONFIG.instream(text);
 }
 
-function clearConsole( outstream ) {
-  outstream.write("\x1B[2J");
+function clearConsole() {
+  CONFIG.outstream.write("\x1B[2J");
 }
 
 function correctGuesses( secretWord, guesses ) {
@@ -109,7 +111,6 @@ function hideLetters( word, correctGuesses ) {
 
   return array.join(" ");
 }
-
 
 function showGuesses( guesses ) {
   return (guesses.length > 0) ? guesses.join(", ") : "";
