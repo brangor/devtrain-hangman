@@ -4,6 +4,7 @@ const dictionaryFile = './lib/dictionary.json';
 
 import { readFile } from 'fs/promises';
 import promptSync from 'prompt-sync';
+import { Player, HangedPerson } from './modules/Entity.mjs';
 
 const CONFIG = {
   instream: promptSync(),
@@ -31,12 +32,20 @@ function selectRandomWord( wordList ) {
 }
 
 function game( secret ) {
-  clearConsole();
+  clearScreen();
 
   const LIVES = 9;
   const guesses = [];
 
   output("welcome to hangman");
+
+  let user = new Player(input("what is your name? "));
+  let victim = new HangedPerson(9);
+
+  clearScreen();
+  output(`${user.name} is playing hangman`);
+  output(`they are deciding the life of poor ${victim.getLongName()},
+    to be hanged today upon the stroke of noon`);
 
   const SECRETWORD = secret["word"].toUpperCase();
 
@@ -50,7 +59,7 @@ function game( secret ) {
       guess = input("guess a letter: ").toUpperCase().trim().substring(0, 1);
     } while( guess.length == 0 )
 
-    clearConsole();
+    clearScreen();
 
     guesses.push(guess);
 
@@ -62,7 +71,7 @@ function game( secret ) {
 
   } while ((LIVES - guesses.length + correctGuesses(SECRETWORD, guesses).length) > 0 && secretReveal.includes('_'));
 
-  clearConsole();
+  clearScreen();
 
   if (secretReveal.includes('_')) {
     output("you lost the game");
@@ -83,7 +92,7 @@ function input( text ) {
   return CONFIG.instream(text);
 }
 
-function clearConsole() {
+function clearScreen() {
   CONFIG.outstream.write("\x1B[2J");
 }
 
