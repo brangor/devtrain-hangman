@@ -2,5 +2,8 @@
   "dependencies": {
     "jshint": "^2.13.5",
     "prompt-sync": "^4.2.0"
+  },
+  "devDependencies": {
+    "window-size": "^1.1.1"
   }
 }

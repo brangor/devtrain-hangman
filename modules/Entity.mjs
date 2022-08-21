@@ -1,13 +1,49 @@
 // file Entity.mjs.
 
 import { pickRandom, peasantJobs, peasantNames } from './helpers.mjs';
+import { Guess } from './Guess.mjs';
+
+const states = {
+  okay: "okay",
+  wounded: "wounded",
+  dying: "dying",
+  dead: "dead",
+}
+
+const thresholds = {
+  [states.dead]: 0,
+  [states.dying]: 3,
+  [states.wounded]: 7,
+  [states.okay]: 9,
+}
 
 class Entity {
-  constructor(name) {
+  constructor(name, health = 100, state = states.okay) {
+    this.name = name;
+    this.health = health;
+    this.state = state;
+  }
+
+  setName(name) {
     this.name = name;
   }
 
-  act() { }
+  getState() {
+    if (this.health <= thresholds[states.dead]) {
+      this.state = states.dead;
+    } else if (this.health <= thresholds[states.dying]) {
+      this.state = states.dying;
+    } else if (this.health <= thresholds[states.wounded]) {
+      this.state = states.wounded;
+    } else if (this.health <= thresholds[states.okay]) {
+      this.state = states.okay;
+    }
+    return this.state;
+  }
+
+  isDead() {
+    return this.getState() === states.dead;
+  }
 }
 
 class Peasant extends Entity {
@@ -31,29 +67,33 @@ class Peasant extends Entity {
   getLongName() {
     return this.name + " the " + this.job;
   }
+
+  says(message) {
+    return `${this.getLongName()} says: "${message}"`;
+  }
 }
 
 export class Player extends Peasant {
   constructor(name) {
     super(name, 'Hangman');
+    this.guesses = [];
   }
 
-  act() {
-    // requestGuess();
+  saveGuess(guess) {
+    this.guesses.push(guess);
+  }
 
-    // submitGuess();
+  guess(prompt) {
+    const guess = new Guess(prompt);
+    return guess;
   }
 }
 
 export class HangedPerson extends Peasant {
-  constructor(lives = 9) {
+  constructor(health = 9) {
     super();
     this.name = super.getRandomName();
-    this.lives = lives;
-  }
-
-  act() {
-    return this.yelp();
+    this.health = health;
   }
 
   yelp() {
@@ -70,17 +110,12 @@ export class HangedPerson extends Peasant {
       "tell me ma i love her",
     ];
 
-    return pickRandom(painNoises);
+    this.health -= 1;
+    return this.says(pickRandom(painNoises));
   }
 
-  loseLife() {
-    this.lives -= 1;
-
-    return this.yelp();
+  takeDamage() {
+    this.health -= 1;
+    return this.says(this.yelp());
   }
 }
-
-
-const peasant = new HangedPerson();
-
-console.log(peasant.getLongName());

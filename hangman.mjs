@@ -43,11 +43,11 @@ function game( secret ) {
   let victim = new HangedPerson(9);
 
   clearScreen();
-  output(`${user.name} is playing hangman`);
+  output(`${user.getName()} is playing hangman`);
   output(`they are deciding the life of poor ${victim.getLongName()},
     to be hanged today upon the stroke of noon`);
 
-  const SECRETWORD = secret["word"].toUpperCase();
+  const SECRETWORD = secret.word.toUpperCase();
 
   output("status: " + hideLetters(SECRETWORD, correctGuesses(SECRETWORD, guesses)));
 
@@ -63,6 +63,8 @@ function game( secret ) {
 
     guesses.push(guess);
 
+    // 1. check if guess is correct
+    // 2. update secret word
     secretReveal = hideLetters(SECRETWORD, correctGuesses(SECRETWORD, guesses));
 
     output("status: " + secretReveal);

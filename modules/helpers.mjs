@@ -2,6 +2,12 @@ function pickRandom( list ) {
   return list[Math.floor(Math.random()*list.length)];
 }
 
+function times(number, fn) {
+  for (let i = 0; i < number; i++) {
+    fn(i);
+  }
+}
+
 const peasantJobs = [
   "Butcher",
   "Baker",
@@ -59,5 +65,5 @@ const peasantNames = {
   ]
 };
 
-export { pickRandom, peasantJobs, peasantNames };
+export { pickRandom, times, peasantJobs, peasantNames };
 
