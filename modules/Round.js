@@ -1,4 +1,4 @@
-// file Round.mjs.
+// file Round.js.
 
 export class Round {
   constructor(game) {

@@ -1,4 +1,4 @@
-// file Guess.mjs.
+// file Guess.js.
 
 const validityRegex = /^[A-Z]{1}$/i;
 export class Guess {

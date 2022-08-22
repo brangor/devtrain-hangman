@@ -1,9 +1,11 @@
-// file Entity.mjs.
+// file Entity.js.
 
-import { pickRandom, peasantJobs, peasantNames } from './helpers.mjs';
-import { Guess } from './Guess.mjs';
+import { pickRandom, peasantJobs, peasantNames } from './helpers.js';
+import { Guess } from './Guess.js';
 
 const states = {
+  great: "great",
+  awful: "awful",
   okay: "okay",
   wounded: "wounded",
   dying: "dying",
@@ -11,10 +13,12 @@ const states = {
 }
 
 const thresholds = {
-  [states.dead]: 0,
-  [states.dying]: 3,
+  [states.great]: 100,
+  [states.okay]: 60,
+  [states.awful]: 9,
   [states.wounded]: 7,
-  [states.okay]: 9,
+  [states.dying]: 3,
+  [states.dead]: 0,
 }
 
 class Entity {
@@ -37,8 +41,14 @@ class Entity {
       this.state = states.wounded;
     } else if (this.health <= thresholds[states.okay]) {
       this.state = states.okay;
+    } else if (this.health <= thresholds[states.great]) {
+      this.state = states.great;
     }
     return this.state;
+  }
+
+  getName() {
+    return this.name;
   }
 
   isDead() {
@@ -46,26 +56,27 @@ class Entity {
   }
 }
 
-class Peasant extends Entity {
+export class Peasant extends Entity {
   constructor(name, job) {
     super(name);
-    this.job = job || pickRandom(peasantJobs);
+    this.name = (name || this.getRandomName());
+    this.job = (job || this.getRandomJob());
   }
 
   getRandomName() {
     return [pickRandom(peasantNames.firsts), pickRandom(peasantNames.lasts)].join(" ");
   }
 
+  getRandomJob() {
+    return pickRandom(peasantJobs);
+  }
+
   getJob() {
     return this.job;
   }
 
-  getName() {
-    return this.name;
-  }
-
   getLongName() {
-    return this.name + " the " + this.job;
+    return this.getName() + " the " + this.job;
   }
 
   says(message) {

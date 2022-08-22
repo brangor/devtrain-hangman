@@ -1,4 +1,4 @@
-// file Screen.mjs.
+// file Screen.js.
 
 import size from 'window-size';
 

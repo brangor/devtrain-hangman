@@ -1,12 +1,10 @@
 #!/usr/bin/env node
-// file Game.mjs.
+// file Game.js.
 
-import { dictionary } from './lib/dictionary.mjs';
-
-import { Player, HangedPerson } from './modules/Entity.mjs';
-import { Guess } from './modules/Guess.mjs';
-import { pickRandom } from './modules/helpers.mjs';
-import { Screen } from './modules/Screen.mjs';
+import { Peasant, Player, HangedPerson } from './Entity.js';
+import { Guess } from './Guess.js';
+import { pickRandom } from './helpers.js';
+import { Screen } from './Screen.js';
 
 const messages = {
   welcome: "Welcome to the game of hangman.\n",
@@ -16,7 +14,7 @@ const messages = {
   lose: "You lose.\n",
   goodGuess: "Good guess!\n",
   badGuess: "Bad guess.\n",
-  greetings: "Hello, %s.\n",
+  greetings: "Hello, ",
   validGuess: "Valid guess.\n",
   invalidGuess: "Invalid guess.\n",
   tryAgain: "Try again.\n",
@@ -28,7 +26,7 @@ const states = {
   active: "active",
 }
 
-class Game {
+export class Game {
   constructor(dictionary) {
     this.secret = pickRandom(dictionary);
     this.secretWord = this.secret.word.toUpperCase();
@@ -41,7 +39,7 @@ class Game {
 
   start() {
     this.player.setName(this.prompt("What is your name? "));
-    this.print(messages.greetings, this.player.getName());
+    this.print(messages.greetings + this.player.getName());
 
     while (!this.gameOver()) {
       let guess;
@@ -130,6 +128,3 @@ class Game {
     return this.getState() !== states.active;
   }
 }
-
-
-new Game(dictionary).start();
